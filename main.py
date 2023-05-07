@@ -20,6 +20,8 @@ def main():
     # 初始化串口（与Arduino通讯）
     arduino=serial_with_arduino.Arduino()
 
+    # let me test
+    # using git in vscode!
 
     while True:
         # 利用接近传感器检测物体是否进入相机范围

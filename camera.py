@@ -15,7 +15,7 @@ class Camera():
         dep_frame = np.reshape(frame, [424, 512])
         return cv2.cvtColor(dep_frame, cv2.COLOR_GRAY2RGB)
 
-    #获取rgb图, 1080x1920x4
+    #获取rgb图, 1080x1920x3
     def get_last_rbg(self)->np.ndarray:
         frame = self.kinect.get_last_color_frame()
         return np.reshape(frame, [1080, 1920, 4])[:, :, 0:3]
@@ -25,6 +25,13 @@ class Camera():
         srcImg=self.get_last_rbg()
         roiImg=srcImg[y1:y2+1,x1:x2+1,:]
         roiImg_copy=np.array(roiImg)
+
+        #分割rgb零件图得到二值图像（零件为白色）
         roiImg=image_process.segment(roiImg)
-        roiImg=image_process.get_edge(roiImg)
-        cv2.findContours()
+
+        #计算轮廓的二值图像（轮廓为白色）
+        roiImg,edge=image_process.get_edge(roiImg) #edge.shape=(x,2)
+        
+        #在rgb图上画出找到的轮廓用以显示
+        roiImg=cv2.drawContours(roiImg_copy, (edge,), 0, color=(0,0,255))
+        cv2.imshow("glue contour",roiImg)

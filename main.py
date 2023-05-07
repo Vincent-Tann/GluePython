@@ -8,8 +8,8 @@ import planner
 import arm_control
 def main():
     #初始化相机
-    camera=camera.Camera()
-    if camera.kinect:
+    my_camera=camera.Camera()
+    if my_camera.kinect:
         print("Initialize Kinect succeeded!")
     else:
         print("Initialize Kinect failed!")
@@ -20,9 +20,6 @@ def main():
     # 初始化串口（与Arduino通讯）
     arduino=serial_with_arduino.Arduino()
 
-    # let me test
-    # using git in vscode!
-
     while True:
         # 利用接近传感器检测物体是否进入相机范围
         object_detected=arduino.detect_object_for_camera()
@@ -30,7 +27,7 @@ def main():
             continue
         else: # 检测到物体，每个物体只进入一次该分支
             # 利用机器视觉算法求解世界坐标系下：3D涂胶轮廓（含法向量）、零件三维模型和传送带速度
-            contour3d,model3d,v_belt=camera.get_glue_contour() #coutour3d.shape==(n,6),每个点包含xyz和nxnynz
+            contour3d,model3d,v_belt=my_camera.get_glue_contour() #coutour3d.shape==(n,6),每个点包含xyz和nxnynz
             # 在涂胶轮廓上采样,得到静态涂胶点
             point_num=10
             points_s=planner.sample_on_contour(contour3d,point_num)

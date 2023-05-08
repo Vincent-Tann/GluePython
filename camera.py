@@ -21,7 +21,9 @@ class Camera():
         return np.reshape(frame, [1080, 1920, 4])[:, :, 0:3]
 
     # 获取涂胶轮廓的核心函数
-    # @return edge.shape=(x,2), x为轮廓上的点数
+    # @return contour3d.shape=(3,x), x为轮廓上的点数
+    # @return model3d
+    # @return v_belt
     def get_glue_contour(self):
         x1,x2,y1,y2=810,1160,440,580
         srcImg=self.get_last_rbg()
@@ -31,11 +33,37 @@ class Camera():
         #分割rgb零件图得到二值图像（零件为白色）
         roiImg=image_process.segment(roiImg)
 
-        #计算轮廓的二值图像（轮廓为白色）
-        roiImg,edge=image_process.get_edge(roiImg) #edge.shape=(x,2)
+        #计算轮廓的二值图像（轮廓为白色）和轮廓点
+        _,edge=image_process.get_edge(roiImg) #edge.shape=(x,2)
         
         #在rgb图上画出找到的轮廓用以显示
         roiImg=cv2.drawContours(roiImg_copy, (edge,), 0, color=(0,0,255))
         cv2.imshow("glue contour",roiImg)
 
-        return edge
+        #获取轮廓的深度信息
+        depths=np.ones([edge.shape[0],1])
+
+        fx = 1068.169623
+        fy = 1068.258222
+        u0 = 952.5807635 #1920
+        v0 = 537.6288875 #1080
+
+        #涂胶点的像素坐标
+        u=edge[:,0].reshape(-1)
+        v=edge[:,1].reshape(-1)
+
+        #求解相机坐标系下的轮廓点坐标
+        Zc=depths.reshape(-1) 
+        Xc=(u-u0)*Zc/fx
+        Yc=(v-v0)*Zc/fy
+        contour_in_camera=np.vstack([Xc,Yc,Zc]) #shape=(3,x)
+
+        #转换到世界坐标系
+        T_c_w=np.array([[0,1,0,329.4],
+                         [1,0,0,129.9],
+                         [0,0,-1,835],
+                         [0,0,0,1]])
+        contour_in_world=np.dot(T_c_w,contour_in_camera)
+
+
+        return contour_in_world,None,10

@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+# 用于分割RGB图片得到二值图片，选出特定的颜色
 def segment(img):
     # lower=np.array([0, 190, 190, 0])
     # upper=np.array([140, 255, 255, 255])
@@ -8,13 +9,19 @@ def segment(img):
     height=img.shape[0]
     lower=np.dot(np.ones([height,width,1]), np.array([[0, 190, 190]])).astype(np.uint8)
     upper=np.dot(np.ones([height,width,1]), np.array([[140, 255, 255]])).astype(np.uint8) #lower and upper bound for BGR yellow segmentation.
-    print(img.shape)
-    print(lower.shape)
+    # print(img.shape)
+    # print(lower.shape)
     return cv2.inRange(img,lower,upper) #需要lower、upper和imgsize相同
 
-def get_edge(img):
+# 用于在二值图片上找到涂胶轮廓
+def get_edge(img,margin=15):
+    #中值滤波
     img_f=cv2.medianBlur(img,11)
-    edge_img=cv2.Canny(img_f,100.0,300.0)
+    #腐蚀缩小,margin决定腐蚀的程度大小
+    kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,ksize=(margin,margin))
+    img_e=cv2.erode(img_f,kernel)
+    #提取边缘
+    edge_img=cv2.Canny(img_e,100.0,300.0)
     edge=cv2.findContours(edge_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
     return edge_img,edge[0][0].reshape(-1,2)
 

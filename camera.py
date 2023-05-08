@@ -25,24 +25,36 @@ class Camera():
     # @return model3d
     # @return v_belt
     def get_glue_contour(self):
-        x1,x2,y1,y2=810,1160,440,580
+        #获取图像
         srcImg=self.get_last_rbg()
+        depthImg=self.get_last_depth()
+
+        #获取rgb到depth的映射表
+        # ......
+
+        #roi范围
+        x1,x2,y1,y2=810,1160,440,580
         roiImg=srcImg[y1:y2+1,x1:x2+1,:]
         roiImg_copy=np.array(roiImg)
 
         #分割rgb零件图得到二值图像（零件为白色）
         roiImg=image_process.segment(roiImg)
 
-        #计算轮廓的二值图像（轮廓为白色）和轮廓点
+        #计算轮廓的二值图像（轮廓为白色）和轮廓点像素坐标
         _,edge=image_process.get_edge(roiImg) #edge.shape=(x,2)
-        
+
         #在rgb图上画出找到的轮廓用以显示
         roiImg=cv2.drawContours(roiImg_copy, (edge,), 0, color=(0,0,255))
         cv2.imshow("glue contour",roiImg)
 
+        #转换为原图像的像素坐标
+        edge[:,0]=edge[:,0]+x1
+        edge[:,1]=edge[:,1]+y1
+
         #获取轮廓的深度信息
         depths=np.ones([edge.shape[0],1])
 
+        #相机参数
         fx = 1068.169623
         fy = 1068.258222
         u0 = 952.5807635 #1920

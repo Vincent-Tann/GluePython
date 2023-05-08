@@ -42,7 +42,7 @@ cv2.waitKey(0)
 edge_img,edge=get_edge(img_s)
 print(type(edge))
 print(edge.shape)
-# print(edge)
+print(edge)
 cv2.imshow('edge_img',edge_img)
 cv2.waitKey(0)
 

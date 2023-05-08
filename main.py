@@ -16,7 +16,7 @@ def main():
         return
     
     # 初始化机械臂
-    arm_control.init_arm()
+    arm=arm_control.RobotArm()
 
     # 初始化串口（与Arduino通讯）
     arduino=serial_with_arduino.Arduino()
@@ -37,7 +37,7 @@ def main():
             dt=0.2
             points_d=planner.dynamicalize(points_s,v_belt,t0,dt)
             #涂胶
-            arm_control.glue(points_d,t0,dt)
+            arm.glue(points_d,t0,dt)
 
             print("finish glueing object!")
 

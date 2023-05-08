@@ -16,6 +16,7 @@ def main():
         return
     
     # 初始化机械臂
+    arm_control.init_arm()
 
     # 初始化串口（与Arduino通讯）
     arduino=serial_with_arduino.Arduino()

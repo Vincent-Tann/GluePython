@@ -3,6 +3,7 @@ from pykinect2 import PyKinectRuntime
 import cv2
 import numpy as np
 import image_process
+import mapper
 
 class Camera():
     def __init__(self) -> None:
@@ -27,10 +28,9 @@ class Camera():
     def get_glue_contour(self):
         #获取图像
         srcImg=self.get_last_rbg()
-        depthImg=self.get_last_depth()
 
         #获取rgb到depth的映射表
-        # ......
+        depth_map=mapper.depth_2_color_space(self.kinect, PyKinectV2._DepthSpacePoint, self.kinect._depth_frame_data, return_aligned_image=True)
 
         #roi范围
         x1,x2,y1,y2=810,1160,440,580
@@ -51,18 +51,18 @@ class Camera():
         edge[:,0]=edge[:,0]+x1
         edge[:,1]=edge[:,1]+y1
 
+        #涂胶点的像素坐标u和v
+        u=edge[:,0].reshape(-1)
+        v=edge[:,1].reshape(-1)
+
         #获取轮廓的深度信息
-        depths=np.ones([edge.shape[0],1])
+        depths=depth_map[v,u]
 
         #相机参数
         fx = 1068.169623
         fy = 1068.258222
         u0 = 952.5807635 #1920
         v0 = 537.6288875 #1080
-
-        #涂胶点的像素坐标
-        u=edge[:,0].reshape(-1)
-        v=edge[:,1].reshape(-1)
 
         #求解相机坐标系下的轮廓点坐标
         Zc=depths.reshape(-1) 

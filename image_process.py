@@ -23,29 +23,34 @@ def get_edge(img,margin=15):
     #提取边缘
     edge_img=cv2.Canny(img_e,100.0,300.0)
     edge=cv2.findContours(edge_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
-    return edge_img,edge[0][0].reshape(-1,2)
+    print("edge: ",edge)
+    if edge[0]==():
+        edge_return=np.array([None])
+    else:
+        edge_return=edge[0][0].reshape(-1,2)
+    return edge_img,edge_return
 
 
 
-img=cv2.imread('./images/yp.bmp') #中文路径读不进来
-# cv2.imshow('img',img)
+# img=cv2.imread('./images/yp.bmp') #中文路径读不进来
+# # cv2.imshow('img',img)
+# # cv2.waitKey(0)
+# print(img.shape)
+# print(type(img))
+# print('ok')
+# img_s=segment(img)
+# print(img_s.dtype)
+# # img_s=cv2.medianBlur(img_s,11)
+# cv2.imshow('img_s',img_s)
 # cv2.waitKey(0)
-print(img.shape)
-print(type(img))
-print('ok')
-img_s=segment(img)
-print(img_s.dtype)
-# img_s=cv2.medianBlur(img_s,11)
-cv2.imshow('img_s',img_s)
-cv2.waitKey(0)
 
-edge_img,edge=get_edge(img_s)
-print(type(edge))
-print(edge.shape)
-print(edge)
-cv2.imshow('edge_img',edge_img)
-cv2.waitKey(0)
+# edge_img,edge=get_edge(img_s)
+# print(type(edge))
+# print(edge.shape)
+# print(edge)
+# cv2.imshow('edge_img',edge_img)
+# cv2.waitKey(0)
 
-img_c=cv2.drawContours(img,(edge,),0,color=(0,0,255),thickness=2)
-cv2.imshow('img_c',img_c)
-cv2.waitKey(0)
+# img_c=cv2.drawContours(img,(edge,),0,color=(0,0,255),thickness=2)
+# cv2.imshow('img_c',img_c)
+# cv2.waitKey(0)

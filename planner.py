@@ -13,7 +13,7 @@ def sample_on_contour(contour,point_num):
 # @param dt: 两个涂胶点间的时间差
 def dynamicalize(points_s,v_belt,t_delay,dt):
     #把起始点加到最后，形成闭环
-    points_s=np.hstack([points_s,points_s[:,0]])
+    points_s=np.hstack([ points_s, points_s[:,0].reshape(-1,1) ])
     point_num=points_s.shape[1]
     #计算所有点的平移量（y方向）
     delta_t=np.array(range(point_num))*dt+t_delay
